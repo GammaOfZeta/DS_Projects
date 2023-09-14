@@ -1,0 +1,113 @@
+The following pieces of python code contain both decoders and encoders of the two well known encryption techniques: Caesar cipher and Vignère cipher. 
+
+How does Caesar cipher works? https://en.wikipedia.org/wiki/Caesar_cipher
+How does Vignère cipher works? https://en.wikipedia.org/wiki/Vigenère_cipher
+
+
+#I. CAESAR CIPHER 
+
+alphabet_string="abcdefghijklmnopqrstuvwxyz"
+keyword=input(str("Please, provide the offset: \n"))
+message=input(str("Great! Now, write your message here: \n"))
+process=input(str("Good job! Lastly, indicate with a d or an e if you wish to either decode or encode your message: \n"))
+
+#Caesar Decipher
+def caesar_decipher(message, offset):
+  deciphered=""
+  for i in range(len(message)):
+    if message[i] not in alphabet_string:
+      deciphered+=message[i]
+    else:
+      for j in range(len(alphabet_string)):
+        if message[i]==alphabet_string[j]:
+          deciphered+=alphabet_string[j+(offset-26)]
+  return deciphered 
+
+#Caesar Cipher
+def caesar_cipher(message, offset):
+  ciphered=""
+  for i in range(len(message)):
+    if message[i] not in alphabet_string:
+      ciphered+=message[i]
+    else:
+      for j in range(len(alphabet_string)):
+        if message[i]==alphabet_string[j]:
+          ciphered+=alphabet_string[j-offset]
+  return ciphered
+
+print("\n")
+if process=="e":
+    print("Original message: {}\nCoded message: {}".format(message,caesar_cipher(message, offset)))
+elif process=="d":
+    print("Coded message: {}\nDecoded message: {}".format(message,caesar_decipher(message, offset)))
+
+#II. VIGNERE CIPHER 
+
+alphabet="abcdefghijklmnopqrstuvwxyz"
+keyword=input(str("Please, provide the keyword: \n"))
+message=input(str("Great! Now, write your message here: \n"))
+process=input(str("Good job! Lastly, indicate with a d or an e if you wish to either decode or encode your message: \n"))
+
+#This function takes the message and returns a list "opv" with the place value of each of the letters:
+def place_value(message):
+  original_place_value=[]
+  for i in range(len(message)):
+    if message[i] in alphabet:
+      for j in range(len(alphabet)):
+        if message[i]==alphabet[j]:
+          original_place_value.append(j)
+  return original_place_value
+
+opv=place_value(message)
+
+#This function takes the keyword and returns a list "kpv" with the place value of each of the letters of the keyword:
+def k_place_value(keyword):
+  keyword_place_value=[]
+  for i in range(len(keyword)):
+    for j in range(len(alphabet)):
+      if keyword[i]==alphabet[j]:
+        keyword_place_value.append(j)
+  return keyword_place_value
+
+kpv=k_place_value(keyword)
+
+#This function takes both lists opv and kpv and returns a list with the values of the left shifts for each letter of the message (this function is for the encoding process):
+def left_shift_value(opv,kpv):
+  k=0
+  left_shifts=[]
+  while k<len(opv):
+    left_shifts.append(opv[k]-kpv[k%len(kpv)])
+    k+=1
+  return left_shifts
+
+left_shifts_list=left_shift_value(opv,kpv)
+
+
+#This function takes both lists opv and kpv and returns a list with the values of the right shifts for each letter of the message (this function is for the decoding process):
+def right_shift_value(opv,kpv):
+  k=0
+  right_shifts=[]
+  while k<len(opv):
+    right_shifts.append(opv[k]+kpv[k%len(kpv)]-26)
+    k+=1
+  return right_shifts
+
+right_shifts_list=right_shift_value(opv,kpv)
+
+#The following function performs both ciphering and deciphering, depending on the input list. If you wich to cipher, use the left_shifts_list. Otherwise, use the right_shifts_list.
+def vignere_cipher_decipher(shifts_list,message):
+  coded=""
+  count=0
+  for i in range(len(message)):
+    if message[i] not in alphabet:
+      coded+=message[i]
+    else:
+      coded+=alphabet[shifts_list[count]]
+      count+=1
+  return coded
+
+print("\n")
+if process=="e":
+    print("Original message: {}\nCoded message: {}".format(message,vignere_cipher_decipher(left_shifts_list,message)))
+elif process=="d":
+    print("Coded message: {}\nDecoded message: {}".format(message,vignere_cipher_decipher(right_shifts_list,message)))
